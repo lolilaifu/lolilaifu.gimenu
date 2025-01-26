@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Genshin Impact Manager</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <button id="characters-tab">Characters</button>
+    <button id="teams-tab">Teams</button>
+    <button id="weapons-tab">Weapons</button>
+  </nav>
+
+  <main>
+    <!-- Characters Section -->
+    <section id="characters-section" class="active">
+      <div class="characters-list"></div>
+      <button id="add-character">Add Character</button>
+    </section>
+
+    <!-- Teams Section -->
+    <section id="teams-section">
+      <div class="teams-list"></div>
+      <button id="add-team">Add Team</button>
+    </section>
+
+    <!-- Weapons Section -->
+    <section id="weapons-section">
+      <div class="weapons-list"></div>
+      <button id="add-weapon">Add Weapon</button>
+    </section>
+  </main>
+
+  <!-- Modals -->
+  <div id="character-modal" class="modal">
+    <div class="modal-content">
+      <h2>Character Details</h2>
+      <div class="character-image-container">
+        <img class="character-image" src="" alt="Character Image">
+        <input type="file" id="character-image-upload" accept="image/*">
+      </div>
+      <!-- Character stats form will be injected here -->
+      <button class="close-modal">Close</button>
+    </div>
+  </div>
+
+  <div id="weapon-modal" class="modal">
+    <div class="modal-content">
+      <h2>Weapon Details</h2>
+      <div class="weapon-detail-image-container">
+        <img class="weapon-detail-image" src="" alt="Weapon Image">
+        <input type="file" id="weapon-detail-image-upload" accept="image/*">
+      </div>
+      <!-- Weapon stats form will be injected here -->
+      <button class="close-modal">Close</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
