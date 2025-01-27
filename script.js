@@ -29,6 +29,107 @@ document.querySelectorAll('nav button').forEach(button => {
   });
 });
 
+let currentActiveSection = 'characters';
+
+// Settings modal
+document.getElementById('settings-btn').addEventListener('click', () => {
+  // Store current active section
+  currentActiveSection = Object.keys(sections).find(key => sections[key].classList.contains('active')) || 'characters';
+  document.getElementById('settings-modal').classList.add('active');
+});
+
+// Settings modal close handler
+document.querySelector('#settings-modal .close-modal').addEventListener('click', () => {
+  document.getElementById('settings-modal').classList.remove('active');
+  showSection(currentActiveSection || 'characters');
+});
+
+// Handle modal close
+document.querySelectorAll('.close-modal, .close-top').forEach(button => {
+  button.addEventListener('click', () => {
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.classList.remove('active');
+    });
+    // Restore previous active section
+    showSection(currentActiveSection);
+  });
+});
+
+// Theme management
+const themeSelect = document.getElementById('theme-select');
+themeSelect.addEventListener('change', (e) => {
+  document.documentElement.setAttribute('data-theme', e.target.value);
+});
+
+// Set initial theme from localStorage or default
+const savedTheme = localStorage.getItem('theme') || 'default';
+themeSelect.value = savedTheme;
+document.documentElement.setAttribute('data-theme', savedTheme);
+
+// Save theme preference when changed
+themeSelect.addEventListener('change', (e) => {
+  const theme = e.target.value;
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+});
+
+// Cookie management
+document.getElementById('download-cookies').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const data = {
+    characters: JSON.parse(localStorage.getItem('characters')),
+    teams: JSON.parse(localStorage.getItem('teams')),
+    weapons: JSON.parse(localStorage.getItem('weapons'))
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'genshin-data-backup.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('upload-cookies').addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target.result);
+          
+          if (data.characters && data.teams && data.weapons) {
+            localStorage.setItem('characters', JSON.stringify(data.characters));
+            localStorage.setItem('teams', JSON.stringify(data.teams));
+            localStorage.setItem('weapons', JSON.stringify(data.weapons));
+            
+            updateCharactersList();
+            updateTeamsList();
+            updateWeaponsList();
+            alert('Data restored successfully!');
+          } else {
+            throw new Error('Invalid backup file');
+          }
+        } catch (error) {
+          alert('Error restoring data: ' + error.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+  
+  input.click();
+});
+
 function showSection(section) {
   Object.values(sections).forEach(s => s.classList.remove('active'));
   sections[section].classList.add('active');
@@ -246,13 +347,36 @@ function showCharacterDetails(id) {
   });
 }
 
+let pendingDelete = {
+  type: null,
+  id: null
+};
+
+function showConfirmation(message, callback) {
+  const modal = document.getElementById('confirmation-modal');
+  document.getElementById('confirmation-message').textContent = message;
+  modal.classList.add('active');
+  
+  document.getElementById('confirm-yes').onclick = () => {
+    modal.classList.remove('active');
+    callback(true);
+  };
+  
+  document.getElementById('confirm-no').onclick = () => {
+    modal.classList.remove('active');
+    callback(false);
+  };
+}
+
 function removeCharacter(id) {
-  if (confirm('Are you sure you want to remove this character?')) {
-    let characters = JSON.parse(localStorage.getItem('characters'));
-    characters = characters.filter(c => c.id !== id);
-    localStorage.setItem('characters', JSON.stringify(characters));
-    updateCharactersList();
-  }
+  showConfirmation('Are you sure you want to remove this character?', (confirmed) => {
+    if (confirmed) {
+      let characters = JSON.parse(localStorage.getItem('characters'));
+      characters = characters.filter(c => c.id !== id);
+      localStorage.setItem('characters', JSON.stringify(characters));
+      updateCharactersList();
+    }
+  });
 }
 
 // Weapon Details
@@ -313,12 +437,14 @@ function showWeaponDetails(id) {
 }
 
 function removeWeapon(id) {
-  if (confirm('Are you sure you want to remove this weapon?')) {
-    let weapons = JSON.parse(localStorage.getItem('weapons'));
-    weapons = weapons.filter(w => w.id !== id);
-    localStorage.setItem('weapons', JSON.stringify(weapons));
-    updateWeaponsList();
-  }
+  showConfirmation('Are you sure you want to remove this weapon?', (confirmed) => {
+    if (confirmed) {
+      let weapons = JSON.parse(localStorage.getItem('weapons'));
+      weapons = weapons.filter(w => w.id !== id);
+      localStorage.setItem('weapons', JSON.stringify(weapons));
+      updateWeaponsList();
+    }
+  });
 }
 
 // Team Editing
@@ -366,12 +492,14 @@ function editTeam(id) {
 }
 
 function removeTeam(id) {
-  if (confirm('Are you sure you want to remove this team?')) {
-    let teams = JSON.parse(localStorage.getItem('teams'));
-    teams = teams.filter(t => t.id !== id);
-    localStorage.setItem('teams', JSON.stringify(teams));
-    updateTeamsList();
-  }
+  showConfirmation('Are you sure you want to remove this team?', (confirmed) => {
+    if (confirmed) {
+      let teams = JSON.parse(localStorage.getItem('teams'));
+      teams = teams.filter(t => t.id !== id);
+      localStorage.setItem('teams', JSON.stringify(teams));
+      updateTeamsList();
+    }
+  });
 }
 
 // Modal Close Handlers
@@ -380,6 +508,8 @@ document.querySelectorAll('.close-modal').forEach(button => {
     document.querySelectorAll('.modal').forEach(modal => {
       modal.classList.remove('active');
     });
+    // Restore previous active section
+    showSection(currentActiveSection);
   });
 });
 
