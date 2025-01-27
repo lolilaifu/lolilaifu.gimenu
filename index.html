@@ -7,11 +7,12 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <nav>
-    <button id="characters-tab">Characters</button>
-    <button id="teams-tab">Teams</button>
-    <button id="weapons-tab">Weapons</button>
-  </nav>
+<nav>
+  <button id="characters-tab">Characters</button>
+  <button id="teams-tab">Teams</button>
+  <button id="weapons-tab">Weapons</button>
+  <button id="settings-btn" class="settings-btn">⚙️</button>
+</nav>
 
   <main>
     <!-- Characters Section -->
@@ -54,6 +55,39 @@
         <input type="file" id="weapon-detail-image-upload" accept="image/*">
       </div>
       <!-- Weapon stats form will be injected here -->
+      <button class="close-modal">Close</button>
+    </div>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <div id="confirmation-modal" class="modal">
+    <div class="modal-content">
+      <p id="confirmation-message"></p>
+      <div class="confirmation-buttons">
+        <button id="confirm-yes">Yes</button>
+        <button id="confirm-no">No</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal">
+    <div class="modal-content">
+      <h2>Settings</h2>
+      <div class="settings-options">
+        <div class="theme-selector">
+          <label for="theme-select">Theme:</label>
+          <select id="theme-select">
+            <option value="default">Default</option>
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+            <option value="blue">Blue</option>
+            <option value="green">Green</option>
+          </select>
+        </div>
+        <button id="download-cookies">Backup Data</button>
+        <button id="upload-cookies">Restore Data</button>
+      </div>
       <button class="close-modal">Close</button>
     </div>
   </div>
